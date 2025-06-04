@@ -298,6 +298,7 @@ public class AirlineManagement {
                    case 2: feature2(esql); break;
                    case 3: feature3(esql); break;
                    case 4: feature4(esql); break;
+                   case 5: feature5(esql); break;
                    
 
 
@@ -551,7 +552,8 @@ public class AirlineManagement {
             "FROM FlightInstance " +
             "WHERE FlightDate = '%s';",
             flightDate);
-      int rowCount = esql.executeQueryAndPrintResult(query);
+         
+         int rowCount = esql.executeQueryAndPrintResult(query);
 
          if (rowCount == 0) {
             System.out.println("There is no flights scheduled for this flight date.");
@@ -560,6 +562,42 @@ public class AirlineManagement {
          System.err.println(e.getMessage());
       }
    }
+
+   //given a fight and date, get a list of passengers who made reservations, are on the waiting list, actually flew, on the flight (for flights already completed)
+   //using Reservation Table and Customer Table
+   public static void feature5(AirlineManagement esql) {
+      try {
+         System.out.println("Enter Reservation ID: ");
+         String reserveID = in.readLine();
+
+         String query = String.format(
+            "SELECT C.FirstName, C.LastName, C.Gender, C.DOB, C.Address, C.Phone, C.Zip " +
+            "FROM Reservation R, Customer C " +
+            "WHERE R.ReservationID = '%s' AND R.CustomerID = C.CustomerID;",
+            reserveID);
+
+            int rowCount = esql.executeQueryAndPrintResult(query);
+
+            if (rowCount == 0) {
+            System.out.println("There are no reservations found for this ReservationID.");
+            }
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
