@@ -279,7 +279,7 @@ public class AirlineManagement {
                 System.out.println(".........................");
 
                 //**the following functionalities should only be able to be used by customers**
-                System.out.println("10. Search Flights");
+                System.out.println("11. Search Flights");
                 System.out.println(".........................");
                 System.out.println(".........................");
 
@@ -299,6 +299,8 @@ public class AirlineManagement {
                    case 3: feature3(esql); break;
                    case 4: feature4(esql); break;
                    case 5: feature5(esql); break;
+
+                   case 11: feature11(esql); break;
                    
 
 
@@ -518,7 +520,7 @@ public class AirlineManagement {
    //using FlightInstance Table
    public static void feature3(AirlineManagement esql) {
       try {
-         System.out.print("Enter Flight Number: ");
+         System.out.print("Please Enter Flight Number: ");
          String flightNum = in.readLine();
 
          System.out.print("Please Enter the Date of your Flight (MM/DD/YY): ");
@@ -544,7 +546,7 @@ public class AirlineManagement {
    //using FlightInstance Table
    public static void feature4(AirlineManagement esql) {
       try {
-         System.out.print("Enter Date (MM/DD/YY): ");
+         System.out.print("Please Enter Flight Date (MM/DD/YY): ");
          String flightDate = in.readLine();
 
          String query = String.format(
@@ -567,7 +569,7 @@ public class AirlineManagement {
    //using Reservation Table and Customer Table
    public static void feature5(AirlineManagement esql) {
       try {
-         System.out.println("Enter Reservation ID: ");
+         System.out.println("Please Enter Reservation ID: ");
          String reserveID = in.readLine();
 
          String query = String.format(
@@ -585,6 +587,67 @@ public class AirlineManagement {
          System.err.println(e.getMessage());
       }
    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   //new york, miami, 5/5/25
+   //given a destination and a departure city, find all fights on a given date 
+   //(must return departure and arrival time, number of stops scheduled and ontimerecord as a percentage)
+   //using Flight table and FlightInstance table and Schedule Table
+   public static void feature11(AirlineManagement esql) {
+      try {
+      System.out.print("Please Enter Departure City: ");
+      String departureCity = in.readLine();
+
+      System.out.print("Please Enter Arrival City: ");
+      String arrivalCity = in.readLine();
+
+      System.out.print("Please  Flight Date (MM/DD/YY): ");
+      String flightDate = in.readLine();
+
+      String query = String.format(
+            "SELECT S.DepartureTime, S.ArrivalTime, FI.NumOfStops, " +
+            "ROUND(100.0 * " +
+            "(SELECT COUNT(*) FROM FlightInstance FI2 " +
+            " WHERE FI2.FlightNumber = F.FlightNumber " +
+            " AND FI2.DepartedOnTime = TRUE AND FI2.ArrivedOnTime = TRUE) / " +
+            "(SELECT COUNT(*) FROM FlightInstance FI3 " +
+            " WHERE FI3.FlightNumber = F.FlightNumber), 2) AS OnTimePercentage " +
+            "FROM Flight F " +
+            "JOIN FlightInstance FI ON F.FlightNumber = FI.FlightNumber " +
+            "JOIN Schedule S ON F.FlightNumber = S.FlightNumber " +
+            "WHERE F.DepartureCity = '%s' AND F.ArrivalCity = '%s' " +
+            "AND FI.FlightDate = '%s';",
+            departureCity, arrivalCity, flightDate);
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+            if (rowCount == 0) {
+            System.out.println("There are no flights found for this city and date.");
+            }
+            
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
+
+
+
+
 
 
 
