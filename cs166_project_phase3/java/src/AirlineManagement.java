@@ -297,6 +297,7 @@ public class AirlineManagement {
                    case 1: feature1(esql); break;
                    case 2: feature2(esql); break;
                    case 3: feature3(esql); break;
+                   case 4: feature4(esql); break;
                    
 
 
@@ -492,7 +493,7 @@ public class AirlineManagement {
          System.out.print("Please Enter Flight Number: ");
          String flightNum = in.readLine();
 
-         System.out.print("Please Enter the Date of your Flight (MM-DD-YY): ");
+         System.out.print("Please Enter the Date of your Flight (MM/DD/YY): ");
          String flightDate = in.readLine();
 
          String query = String.format(
@@ -519,7 +520,7 @@ public class AirlineManagement {
          System.out.print("Enter Flight Number: ");
          String flightNum = in.readLine();
 
-         System.out.print("Please Enter the Date of your Flight (MM-DD-YY): ");
+         System.out.print("Please Enter the Date of your Flight (MM/DD/YY): ");
          String flightDate = in.readLine();
 
          String query = String.format(
@@ -537,5 +538,38 @@ public class AirlineManagement {
          System.err.println(e.getMessage());
       }
    }
+
+   //given a date, get all flight scheduled on that day
+   //using FlightInstance Table
+   public static void feature4(AirlineManagement esql) {
+      try {
+         System.out.print("Enter Date (MM/DD/YY): ");
+         String flightDate = in.readLine();
+
+         String query = String.format(
+            "SELECT FlightNumber, NumOfStops, TicketCost " +
+            "FROM FlightInstance " +
+            "WHERE FlightDate = '%s';",
+            flightDate);
+      int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There is no flights scheduled for this flight date.");
+         }
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
+
+
+
+
+
+
+
+
+
+
+
 } //end AirlineManagement
 
