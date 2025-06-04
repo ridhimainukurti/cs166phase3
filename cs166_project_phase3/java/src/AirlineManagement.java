@@ -295,12 +295,7 @@ public class AirlineManagement {
                 System.out.println("20. Log out");
                 switch (readChoice()){
                    case 1: feature1(esql); break;
-                   case 2: feature2(esql); break;
-                   case 3: feature3(esql); break;
-                   case 4: feature4(esql); break;
-                   case 5: feature5(esql); break;
-                   case 6: feature6(esql); break;
-
+                   
 
 
 
@@ -353,29 +348,112 @@ public class AirlineManagement {
       return input;
    }//end readChoice
 
-   /*
-    * Creates a new user
-    **/
-   public static void CreateUser(AirlineManagement esql){
-   }//end CreateUser
+   public static void CreateUser(AirlineManagement esql) {
+      try {
+         String firstName, lastName, gender, dob, address, phoneNumber, zipcode;
+         
+         do {
+            System.out.print("Please Enter Your First Name: ");
+            firstName = in.readLine().trim();
+         } while (firstName.isEmpty());
+         
+         do {
+            System.out.print("Please Enter Your Last Name: ");
+            lastName = in.readLine().trim();
+         } while (lastName.isEmpty());
+         
+         do {
+            System.out.print("Please Enter Your Gender (M/F): ");
+            gender = in.readLine().trim().toUpperCase();
+            if (!gender.equals("M") && !gender.equals("F")) {
+               System.out.println("This is an Invalid gender. Please enter M or F.");
+               gender = "";
+            }
+         } while (gender.isEmpty());
+         
+         do {
+            System.out.print("Please Enter DOB (YYYY-MM-DD): ");
+            dob = in.readLine().trim();
+            if (!dob.matches("\\d{4}-\\d{2}-\\d{2}")) {
+               System.out.println("This is an Invalid date format. Use YYYY-MM-DD.");
+               dob = "";
+            }
+         } while (dob.isEmpty());
 
+         do {
+            System.out.print("Please Enter Your Address: ");
+            address = in.readLine().trim();
+         } while (address.isEmpty());
+
+         do {
+            System.out.print("Please Enter Your Phone Number: ");
+            phoneNumber = in.readLine().trim();
+            if (!phoneNumber.matches("[0-9()+\\-\\.x ]{7,30}")) {
+               System.out.println("This is an Invalid phone number format.");
+               phoneNumber = "";
+            }
+        } while (phoneNumber.isEmpty());
+
+        do {
+            System.out.print("Please Enter Your Zipcode: ");
+            zipcode = in.readLine().trim();
+            if (!zipcode.matches("\\d{5}")) {
+               System.out.println("The Zipcode must be exactly 5 digits.");
+               zipcode = "";
+            }
+        } while (zipcode.isEmpty());
+
+        String query = "SELECT MAX(CustomerID) FROM Customer;";
+        List<List<String>> resultList = esql.executeQueryAndReturnResult(query);
+        
+        //Creating Unqiue CustomerID
+        int uniqueCustomerID = 1;
+        if (!resultList.isEmpty() && resultList.get(0).get(0) != null) {
+            uniqueCustomerID = Integer.parseInt(resultList.get(0).get(0)) + 1;
+         }
+        
+      //New User Intersertion 
+      String insertQuery = String.format("INSERT INTO Customer (CustomerID, FirstName, LastName, Gender, DOB, Address, Phone, Zip) " + "VALUES (%d, '%s', '%s', '%s', '%s', '%s', '%s', '%s');", uniqueCustomerID, firstName, lastName, gender, dob, address, phoneNumber, zipcode);
+
+      esql.executeUpdate(insertQuery);
+      System.out.println("User was successfully created!");
+      
+      } catch (Exception e) {
+      System.err.println("There Was An Error in CreateUser: " + e.getMessage());
+   }
+}
 
    /*
     * Check log in credentials for an existing user
     * @return User login or null is the user does not exist
     **/
    public static String LogIn(AirlineManagement esql){
-      return null;
+      try {
+         System.out.print("Please Enter Your First Name: ");
+         String firstName = in.readLine();
+
+         System.out.print("Please Enter Your Last Name: ");
+         String lastName = in.readLine();
+
+         String query = String.format("SELECT CustomerID FROM Customer WHERE FirstName = '%s' AND LastName = '%s';", firstName, lastName);
+
+         List<List<String>> resultList = esql.executeQueryAndReturnResult(query);
+         if (resultList.size() > 0) {
+            System.out.println("The Login Was Successful!");
+            return firstName;
+         } else {
+            System.out.println("The Login Was Not Successful.");
+            return null;
+         }
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+         return null;
+      }
    }//end
 
 // Rest of the functions definition go in here
 
    public static void feature1(AirlineManagement esql) {}
-   public static void feature2(AirlineManagement esql) {}
-   public static void feature3(AirlineManagement esql) {}
-   public static void feature4(AirlineManagement esql) {}
-   public static void feature5(AirlineManagement esql) {}
-   public static void feature6(AirlineManagement esql) {}
   
 
 
