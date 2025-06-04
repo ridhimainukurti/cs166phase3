@@ -453,9 +453,35 @@ public class AirlineManagement {
 
 // Rest of the functions definition go in here
 
-   public static void feature1(AirlineManagement esql) {}
-  
+   //given the flight number, get the flight's schedule for for the week
+   //using Schedule Table
+   public static void feature1(AirlineManagement esql) {
+      try {
+         System.out.print("Please Enter Your Flight Number: ");
+         String flightNum = in.readLine();
 
+         String query = String.format("SELECT DayOfWeek, DepartureTime, ArrivalTime " + 
+         "FROM Schedule " + 
+         "WHERE FlightNumber = '%s' " +
+         "ORDER BY CASE " + 
+         "WHEN DayOfWeek = 'Monday' THEN 1 " + 
+         "WHEN DayOfWeek = 'Tuesday' THEN 2 " + 
+         "WHEN DayOfWeek = 'Wednesday' THEN 3 " +
+         "WHEN DayOfWeek = 'Thursday' THEN 4 " +
+         "WHEN DayOfWeek = 'Friday' THEN 5 " +
+         "WHEN DayOfWeek = 'Saturday' THEN 6 " +
+         "WHEN DayOfWeek = 'Sunday' THEN 7 " +
+         "END;", flightNum);
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There is no schedule for this flight number.");
+         }
+      } catch (Exception e){
+         System.err.println(e.getMessage());
+      }
+   }
 
 }//end AirlineManagement
 
