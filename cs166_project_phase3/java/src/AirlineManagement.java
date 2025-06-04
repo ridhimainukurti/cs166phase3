@@ -296,6 +296,7 @@ public class AirlineManagement {
                 switch (readChoice()){
                    case 1: feature1(esql); break;
                    case 2: feature2(esql); break;
+                   case 3: feature3(esql); break;
                    
 
 
@@ -485,6 +486,7 @@ public class AirlineManagement {
    }
 
    //given the flight and date, get the number of seats still available and the number of seats sold
+   //using FlightInstance Table
    public static void feature2(AirlineManagement esql) {
       try {
          System.out.print("Please Enter Flight Number: ");
@@ -509,6 +511,31 @@ public class AirlineManagement {
          System.err.println(e.getMessage());
       }
    }
-}
-//end AirlineManagement
+
+   //given the flight and date, find whether the flight departed on time and arrived on time
+   //using FlightInstance Table
+   public static void feature3(AirlineManagement esql) {
+      try {
+         System.out.print("Enter Flight Number: ");
+         String flightNum = in.readLine();
+
+         System.out.print("Please Enter the Date of your Flight (MM-DD-YY): ");
+         String flightDate = in.readLine();
+
+         String query = String.format(
+            "SELECT DepartedOnTime, ArrivedOnTime " +
+            "FROM FlightInstance " +
+            "WHERE FlightNumber = '%s' AND FlightDate = '%s';",
+            flightNum, flightDate);
+            
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There is no flight instance found for this flight number and date.");
+         }
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
+} //end AirlineManagement
 
