@@ -618,6 +618,10 @@ public class AirlineManagement {
          System.out.print("Please Enter Your Flight Number: ");
          String flightNum = in.readLine();
 
+         // builds a query to get the weekly schedule for a given flight number
+         // retrieves the day of the week, departure time, and arrival time from the Schedule table
+         // filters by the flight number entered by the user and then is ordering results from Monday to Sunday with
+         // CASE statement to assign numerical order to the days (so that there is logic in the ordering)
          String query = String.format("SELECT DayOfWeek, DepartureTime, ArrivalTime " + 
          "FROM Schedule " + 
          "WHERE FlightNumber = '%s' " +
@@ -896,6 +900,11 @@ public class AirlineManagement {
       System.out.print("Please  Flight Date (MM/DD/YY): ");
       String flightDate = in.readLine();
 
+      // query to get all flights between two cities on a specific date
+      // for each flight, it returns: departure time, arrival time, number of stops,
+      // and the on-time percentage (how often the flight departed and arrived on time)
+      // on-time percentage: using past FlightInstance data by dividing the number of on-time flights by the total number of flights for that flight number
+      // joins Flight, FlightInstance, and Schedule tables, and filters by departure city, arrival city, and date
       String query = String.format(
             "SELECT S.DepartureTime, S.ArrivalTime, FI.NumOfStops, " +
             "ROUND(100.0 * " +
@@ -910,7 +919,9 @@ public class AirlineManagement {
             "WHERE F.DepartureCity = '%s' AND F.ArrivalCity = '%s' " +
             "AND FI.FlightDate = '%s';",
             departureCity, arrivalCity, flightDate);
-
+            
+         //method runs a SELECT query, grabs all the rows and columns from the result, converts every value to a string, 
+         //and stores everything in a list-of-lists format that's easy to work with in Java.
          int rowCount = esql.executeQueryAndPrintResult(query);
 
             if (rowCount == 0) {
@@ -1139,9 +1150,13 @@ public class AirlineManagement {
          System.out.print("Please Enter Technician Id: ");
          String technicianID = in.readLine();
 
+         //gets the current highest repair ID that is in the Repair table,
          String getMaxIDQuery = "SELECT MAX(RepairID) FROM Repair;";
+         // run the query using executeQueryAndReturnResult, which returns a list of rows (each row is a list of strings)
+         //MAX(), there will only be one row with one value (the current max RepairID)
          List<List<String>> resultList = esql.executeQueryAndReturnResult(getMaxIDQuery);
-         int newRepairID = 1;
+         int newRepairID = 1; //default if empty
+         //if the table is not empty,then parse the RepairID and then increment it by 1
          if (!resultList.isEmpty() && resultList.get(0).get(0) != null) {
             newRepairID = Integer.parseInt(resultList.get(0).get(0)) + 1;
          }
