@@ -277,6 +277,7 @@ public class AirlineManagement {
                 System.out.println("5. View Full Order ID History");
                 System.out.println("6. View Traveler Information");
                 System.out.println("7. View Plane Information");
+                System.out.println("8. View Technician Repairs");
 
                 //**the following functionalities should only be able to be used by customers**
                 System.out.println("11. Search Flights");
@@ -301,6 +302,7 @@ public class AirlineManagement {
                    case 5: feature5(esql); break;
                    case 6: feature6(esql); break;
                    case 7: feature7(esql); break;
+                   case 8: feature8(esql); break;
 
 
                    case 11: feature11(esql); break;
@@ -637,6 +639,31 @@ public class AirlineManagement {
          if (rowCount == 0) {
             System.out.println("There is no information found for this Reservation ID");
          }
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
+
+   //given a maintanence technician id, list all repairs made by that person 
+   //Use Repair Table 
+   public static void feature8(AirlineManagement esql) {
+      try {
+         System.out.println("Please enter technician ID: "); 
+         String techID = in.readLine();
+
+         String query = String.format(
+            "SELECT PlaneID, RepairCode, RepairDate " +
+            "FROM Repair " +
+            "WHERE TechnicianID = '%s' " +
+            "ORDER BY RepairDate ASC;",
+            techID);
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There is no repairs found for this Technician ID");
+         }
+
       } catch (Exception e) {
          System.err.println(e.getMessage());
       }
