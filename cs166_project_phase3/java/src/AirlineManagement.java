@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.ArrayList;
 import java.lang.Math;
+import java.util.UUID;
 
 /**
  * This class defines a simple embedded SQL utility class that is designed to
@@ -275,22 +276,25 @@ public class AirlineManagement {
                 System.out.println("3. View Flight Status");
                 System.out.println("4. View Flights of the day");  
                 System.out.println("5. View Full Order ID History");
-                System.out.println(".........................");
-                System.out.println(".........................");
+                System.out.println("6. View Traveler Information");
+                System.out.println("7. View Plane Information");
+                System.out.println("8. View Technician Repairs");
+                System.out.println("9. View Plane Repair History");
+                System.out.println("10. View Flight Statistics");
 
                 //**the following functionalities should only be able to be used by customers**
                 System.out.println("11. Search Flights");
-                System.out.println(".........................");
-                System.out.println(".........................");
+                System.out.println("12. View Ticket Costs");
+                System.out.println("13. View Airplane Type for Flight");
+                System.out.println("14. Reserve a Flight (Waitlist if Needed)");
 
                 //**the following functionalities should ony be able to be used by Pilots**
-                System.out.println("15. Maintenace Request");
-                System.out.println(".........................");
-                System.out.println(".........................");
+                System.out.println("15. View Pilot Maintenance Requests");
 
                //**the following functionalities should ony be able to be used by Technicians**
-                System.out.println(".........................");
-                System.out.println(".........................");
+                System.out.println("16. View Plane Repair History");
+                System.out.println("17. View Maintenace Requests");
+                System.out.println("18. View Repair Information");
 
                 System.out.println("20. Log out");
                 switch (readChoice()){
@@ -299,15 +303,19 @@ public class AirlineManagement {
                    case 3: feature3(esql); break;
                    case 4: feature4(esql); break;
                    case 5: feature5(esql); break;
-
+                   case 6: feature6(esql); break;
+                   case 7: feature7(esql); break;
+                   case 8: feature8(esql); break;
+                   case 9: feature9(esql); break;
+                   case 10: feature10(esql); break;
                    case 11: feature11(esql); break;
-
-
-
+                   case 12: feature12(esql); break;
+                   case 13: feature13(esql); break;
+                   case 14: feature14(esql); break;
                    case 15: feature15(esql); break; 
-                   
-
-
+                   case 16: feature16(esql); break; 
+                   case 17: feature17(esql); break;
+                   case 18: feature18(esql); break;
 
                    case 20: usermenu = false; break;
                    default : System.out.println("Unrecognized choice!"); break;
@@ -593,20 +601,145 @@ public class AirlineManagement {
    }
 
 
+   //Given a reservation number, retrieve information about the traverlers under that number (First/last name, geneder, dob, address, phone number, zipcode)
+   //Using Reservation and Customer Table 
+   public static void feature6(AirlineManagement esql) {
+      try {
+         System.out.println("Please enter reservation ID: "); 
+         String reserveID = in.readLine(); 
+
+         String query = String.format(
+            "SELECT C.FirstName, C.LastName, C.Gender, C.DOB, C.Address, C.Phone, C.Zip " +
+            "FROM Customer C, Reservation R " +
+            "WHERE R.ReservationID = '%s' AND R.CustomerID = C.CustomerID;",
+            reserveID);
+         
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There is no information found for this Reservation ID");
+         }
+      } catch (Exception e) {
+         System.err.println(e.getMessage()); 
+      }
+   }
+
+   //given a plane number, get its make, model, age, last repair date 
+   //Use Plane Table
+   public static void feature7(AirlineManagement esql) {
+      try {
+         System.out.println("Please enter Plane ID: ");
+         String planeID = in.readLine(); 
+
+         String query = String.format(
+            "SELECT Make, Model, (EXTRACT(YEAR FROM CURRENT_DATE) - Year) AS Age, LastRepairDate " +
+            "FROM Plane " +
+            "WHERE PlaneID = '%s';",
+            planeID);
+         
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There is no information found for this Reservation ID");
+         }
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
+
+   //given a maintanence technician id, list all repairs made by that person 
+   //Use Repair Table 
+   public static void feature8(AirlineManagement esql) {
+      try {
+         System.out.println("Please enter technician ID: "); 
+         String techID = in.readLine();
+
+         String query = String.format(
+            "SELECT PlaneID, RepairCode, RepairDate " +
+            "FROM Repair " +
+            "WHERE TechnicianID = '%s' " +
+            "ORDER BY RepairDate ASC;",
+            techID);
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There is no repairs found for this Technician ID");
+         }
+
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
+
+   //given a plane id and date range, list all the dates and codes for repairs performed 
+   //Use Repair Table
+   public static void feature9(AirlineManagement esql) {
+      try {
+         System.out.println("Please enter Plane ID: "); 
+         String planeID = in.readLine();
+
+         System.out.println("Please enter start date (YYYY-MM-DD): ");
+         String startDate = in.readLine(); 
+
+         System.out.println("Please enter end date (YYYY-MM-DD): ");
+         String endDate = in.readLine(); 
+
+         String query = String.format(
+            "SELECT RepairDate, RepairCode " +
+            "FROM Repair " +
+            "WHERE PlaneID = '%s' " +
+            "AND RepairDate BETWEEN '%s' AND '%s' " +
+            "ORDER BY RepairDate ASC;",
+            planeID, startDate, endDate);
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There is no repairs found for this Plane ID and date range");
+         }
+
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
 
 
+   //given a flight and range of date (start date and end date), show the statistics of the flight 
+   //number of days the flight departed and arrived, number of sold and unsold tickets
+   //Use FlightInstance Table
+   public static void feature10(AirlineManagement esql) {
+      try {
+         System.out.println("Please enter flight number: "); 
+         String flightNum = in.readLine();
 
+         System.out.println("Please enter start date (MM/DD/YY): ");
+         String startDate = in.readLine(); 
 
+         System.out.println("Please enter end date (MM/DD/YY): ");
+         String endDate = in.readLine(); 
 
+         String query = String.format(
+            "SELECT " +
+            "COUNT(CASE WHEN DepartedOnTime = TRUE THEN 1 END) AS DepartedOnTimeCount, " +
+            "COUNT(CASE WHEN ArrivedOnTime = TRUE THEN 1 END) AS ArrivedOnTimeCount, " +
+            "SUM(SeatsSold) AS TotalSeatsSold, " +
+            "SUM(SeatsTotal - SeatsSold) AS TotalSeatsUnsold " +
+            "FROM FlightInstance " +
+            "WHERE FlightNumber = '%s' " +
+            "AND FlightDate BETWEEN '%s' AND '%s';",
+            flightNum, startDate, endDate);
 
+         int rowCount = esql.executeQueryAndPrintResult(query);
 
+         if (rowCount == 0) {
+            System.out.println("There is no flight instantances found for this Flight Number and date range");
+         }
 
-
-
-
-
-
-
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
 
    //new york, miami, 5/5/25
    //given a destination and a departure city, find all fights on a given date 
@@ -649,19 +782,116 @@ public class AirlineManagement {
       }
    }
 
+   //given a flight number find the ticket cost 
+   //Use FlightInstance Table 
+   public static void feature12(AirlineManagement esql) {
+      try {
+         System.out.println("Please enter flight number: "); 
+         String flightNum = in.readLine(); 
 
+         String query = String.format(
+            "SELECT DISTINCT TicketCost " +
+            "FROM FlightInstance " +
+            "WHERE FlightNumber = '%s';",
+            flightNum);
 
+         int rowCount = esql.executeQueryAndPrintResult(query);
 
+         if (rowCount == 0) {
+            System.out.println("There is no ticket costs found for this Flight Number");
+         }
 
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
 
+   //given a flight number, find the airplane type (make, model)
+   //Use Flight and Plane Table
+   public static void feature13(AirlineManagement esql) {
+      try {
+         System.out.print("Please Enter Flight Number: ");
+         String flightNum = in.readLine();
 
+         String query = String.format(
+            "SELECT P.Make, P.Model " +
+            "FROM Flight F " +
+            "JOIN Plane P ON F.PlaneID = P.PlaneID " +
+            "WHERE F.FlightNumber = '%s';", 
+            flightNum);
 
+         int rowCount = esql.executeQueryAndPrintResult(query);
 
+         if (rowCount == 0) {
+            System.out.println("There are no planes found for this Flight Number.");
+            }
 
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
 
+   //given a make reservation for a flight, get on the waitlist for a flight if the flight is full
+   //Use Reservation and FlightInstance Table
+   public static void feature14(AirlineManagement esql) {
+      try {
+         System.out.print("Please enter Customer ID: ");
+         String customID = in.readLine();
 
+         System.out.println("Please enter Flight Instance ID: ");
+         String flightInstantceID = in.readLine(); 
 
+         //checking for the number of seats
+         String checkingSeatsQuery = String.format(
+            "SELECT SeatsSold, SeatsTotal " +
+            "FROM FlightInstance " +
+            "WHERE FlightInstanceID = %s;",
+            flightInstantceID);
+         
+         List<List<String>> resultList = esql.executeQueryAndReturnResult(checkingSeatsQuery);
 
+         if (resultList.isEmpty()) {
+            System.out.println("Thi is the wrong flight instance ID.");
+            return;
+         }
+
+         int seatsSold = Integer.parseInt(resultList.get(0).get(0));
+         int seatsTotal = Integer.parseInt(resultList.get(0).get(1));
+
+         String currStatus;
+         if (seatsSold < seatsTotal) {
+            currStatus = "reserved"; 
+         } else {
+            currStatus = "waitlisted";
+         }
+         
+         //creating unique reserationIDs
+         String reserveID = "R" + UUID.randomUUID().toString().substring(0, 8);
+
+         //inserting the reservation 
+         String insertReservation = String.format(
+            "INSERT INTO Reservation (ReservationID, CustomerID, FlightInstanceID, Status) " +
+            "VALUES ('%s', %s, %s, '%s');",
+            reserveID, customID, flightInstantceID, currStatus); 
+         
+         esql.executeUpdate(insertReservation);
+
+         //if status is reserved then we will need to increment the seats sold 
+         if (currStatus.equals("reserved")) {
+            String updateSeatsQuery = String.format(
+               "UPDATE FlightInstance " +
+               "SET SeatsSold = SeatsSold + 1 " +
+               "WHERE FlightInstanceID = %s;", flightInstantceID); 
+            
+            esql.executeUpdate(updateSeatsQuery);
+         }
+
+         System.out.println("Reservation " + (currStatus.equals("reserved") ? "confirmed" : "waitlisted") + ". Your Reservation ID is: " + reserveID);
+         
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
 
    //give a plane id and a date range, list all the dates and the codes for repairs performed
    //using Repair Table
@@ -695,18 +925,98 @@ public class AirlineManagement {
       }
    }
 
+   //given a plane Id and date range , list all the dates and the codes for repairs performed 
+   //Use Repair Table
+   public static void feature16(AirlineManagement esql) {
+      try {
+         System.out.println("Please enter Plane ID: "); 
+         String planeID = in.readLine();
 
+         System.out.println("Please enter start date (YYYY-MM-DD): ");
+         String startDate = in.readLine(); 
 
+         System.out.println("Please enter end date (YYYY-MM-DD): ");
+         String endDate = in.readLine(); 
 
+         String query = String.format(
+            "SELECT RepairDate, RepairCode " +
+            "FROM Repair " +
+            "WHERE PlaneID = '%s' " +
+            "AND RepairDate BETWEEN '%s' AND '%s' " +
+            "ORDER BY RepairDate ASC;",
+            planeID, startDate, endDate);
 
+         int rowCount = esql.executeQueryAndPrintResult(query);
 
+         if (rowCount == 0) {
+            System.out.println("There is no repairs found for this Plane ID and date range");
+         }
 
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
 
+   //given a pilot ID, list all maintenance request made by that pilot 
+   //Use MaintenanceRequest Table 
+   public static void feature17(AirlineManagement esql) {
+      try {
+         System.out.print("Please Enter Pilot ID: ");
+         String pilotID = in.readLine();
 
+         String query = String.format(
+           "SELECT PlaneID, RepairCode, RequestDate " +
+            "FROM MaintenanceRequest " +
+            "WHERE PilotID = '%s' " +
+            "ORDER BY RequestDate ASC;",
+            pilotID);
 
+         int rowCount = esql.executeQueryAndPrintResult(query);
 
+         if (rowCount == 0) {
+            System.out.println("There are no maintenance requests found for this Plane ID.");
+            }
 
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
 
+   //try, PL005, RC555, 2025-06-10, T003
+   //after each repair, make an entry showing planeID, repair code, and date of repair
+   //Use Repair Table 
+   public static void feature18(AirlineManagement esql) {
+      try {
+         System.out.print("Please Enter Plane ID: ");
+         String planeID = in.readLine();
 
+         System.out.print("Please Enter Repair Code: ");
+         String repairCode = in.readLine();
+
+         System.out.print("Please Enter Repair Date (YYYY-MM-DD): ");
+         String repairDate = in.readLine();
+
+         System.out.print("Please Enter Technician Id: ");
+         String technicianID = in.readLine();
+
+         String getMaxIDQuery = "SELECT MAX(RepairID) FROM Repair;";
+         List<List<String>> resultList = esql.executeQueryAndReturnResult(getMaxIDQuery);
+         int newRepairID = 1;
+         if (!resultList.isEmpty() && resultList.get(0).get(0) != null) {
+            newRepairID = Integer.parseInt(resultList.get(0).get(0)) + 1;
+         }
+
+         String insertQuery = String.format(
+            "INSERT INTO Repair (RepairID, PlaneID, RepairCode, RepairDate, TechnicianID) " +
+            "VALUES (%d, '%s', '%s', '%s', '%s');",
+            newRepairID, planeID, repairCode, repairDate, technicianID);  
+         
+         esql.executeUpdate(insertQuery);
+
+         System.out.println("The repair entry was added successfully with the RepairID: " + newRepairID);
+
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      } 
+   }
 } //end AirlineManagement
-
