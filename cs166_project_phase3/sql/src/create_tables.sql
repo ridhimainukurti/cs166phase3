@@ -9,7 +9,15 @@ DROP TABLE IF EXISTS Schedule;
 DROP TABLE IF EXISTS Flight;
 DROP TABLE IF EXISTS Plane;
 DROP TABLE IF EXISTS Pilot;
+DROP TABLE IF EXISTS Login;
 
+-- Login Table
+CREATE TABLE Login (
+    userID TEXT PRIMARY KEY,
+    userName TEXT UNIQUE NOT NULL, 
+    password TEXT NOT NULL, 
+    role TEXT CHECK (role IN ('Manager', 'Customer', 'Pilot', 'Technician'))
+);
 -- Plane Table
 CREATE TABLE Plane (
     PlaneID TEXT PRIMARY KEY,

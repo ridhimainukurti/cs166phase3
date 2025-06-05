@@ -269,7 +269,8 @@ public class AirlineManagement {
               while(usermenu) {
                 System.out.println("MAIN MENU");
                 System.out.println("---------");
-
+               
+                if (authorisedUser.equals("Manager")) {
                 //**the following functionalities should only be able to be used by Management**
                 System.out.println("1. View Flights");
                 System.out.println("2. View Flight Seats");
@@ -282,40 +283,49 @@ public class AirlineManagement {
                 System.out.println("9. View Plane Repair History");
                 System.out.println("10. View Flight Statistics");
 
+                } else if (authorisedUser.equals("Customer")) {
                 //**the following functionalities should only be able to be used by customers**
                 System.out.println("11. Search Flights");
                 System.out.println("12. View Ticket Costs");
                 System.out.println("13. View Airplane Type for Flight");
                 System.out.println("14. Reserve a Flight (Waitlist if Needed)");
 
+                } else if (authorisedUser.equals("Pilot")) {
                 //**the following functionalities should ony be able to be used by Pilots**
                 System.out.println("15. View Pilot Maintenance Requests");
 
-               //**the following functionalities should ony be able to be used by Technicians**
+                } else if (authorisedUser.equals("Technicians")) {
+                //**the following functionalities should ony be able to be used by Technicians**
                 System.out.println("16. View Plane Repair History");
                 System.out.println("17. View Maintenace Requests");
                 System.out.println("18. View Repair Information");
 
+                }
+
                 System.out.println("20. Log out");
+
                 switch (readChoice()){
-                   case 1: feature1(esql); break;
-                   case 2: feature2(esql); break;
-                   case 3: feature3(esql); break;
-                   case 4: feature4(esql); break;
-                   case 5: feature5(esql); break;
-                   case 6: feature6(esql); break;
-                   case 7: feature7(esql); break;
-                   case 8: feature8(esql); break;
-                   case 9: feature9(esql); break;
-                   case 10: feature10(esql); break;
-                   case 11: feature11(esql); break;
-                   case 12: feature12(esql); break;
-                   case 13: feature13(esql); break;
-                   case 14: feature14(esql); break;
-                   case 15: feature15(esql); break; 
-                   case 16: feature16(esql); break; 
-                   case 17: feature17(esql); break;
-                   case 18: feature18(esql); break;
+                   case 1: if (authorisedUser.equals("Manager")) feature1(esql); break;
+                   case 2: if (authorisedUser.equals("Manager")) feature2(esql); break;
+                   case 3: if (authorisedUser.equals("Manager")) feature3(esql); break;
+                   case 4: if (authorisedUser.equals("Manager")) feature4(esql); break;
+                   case 5: if (authorisedUser.equals("Manager")) feature5(esql); break;
+                   case 6: if (authorisedUser.equals("Manager")) feature6(esql); break;
+                   case 7: if (authorisedUser.equals("Manager")) feature7(esql); break;
+                   case 8: if (authorisedUser.equals("Manager")) feature8(esql); break;
+                   case 9: if (authorisedUser.equals("Manager")) feature9(esql); break;
+                   case 10: if (authorisedUser.equals("Manager")) feature10(esql); break;
+
+                   case 11: if (authorisedUser.equals("Customer")) feature11(esql); break;
+                   case 12: if (authorisedUser.equals("Customer")) feature12(esql); break;
+                   case 13: if (authorisedUser.equals("Customer")) feature13(esql); break;
+                   case 14: if (authorisedUser.equals("Customer")) feature14(esql); break;
+
+                   case 15: if (authorisedUser.equals("Pilot")) feature15(esql); break; 
+
+                   case 16: if (authorisedUser.equals("Technician")) feature16(esql); break; 
+                   case 17: if (authorisedUser.equals("Technician")) feature17(esql); break;
+                   case 18: if (authorisedUser.equals("Technician")) feature18(esql); break;
 
                    case 20: usermenu = false; break;
                    default : System.out.println("Unrecognized choice!"); break;
@@ -366,101 +376,225 @@ public class AirlineManagement {
       return input;
    }//end readChoice
 
+   //HELPER FUNCTION 
+   public static boolean isValidPassword(String password) {
+      if (password.length() < 6) {
+         System.out.println("The password must be at least 6 characters long.");
+         return false; 
+      }
+
+      if (!password.matches(".*[A-Z].*")) {
+         System.out.println("The password must contain at least one uppercase letter.");
+         return false;
+      }
+
+      if (!password.matches(".*[!@#$%^&*()].*")) {
+         System.out.println("The password must contain at least one special character (!@#$%^&*()).");
+         return false;
+      }
+      return true;
+   }
+
    public static void CreateUser(AirlineManagement esql) {
       try {
-         String firstName, lastName, gender, dob, address, phoneNumber, zipcode;
-         
+         String userName, password, role;
+
+         //figure out what type of role the user is 
          do {
-            System.out.print("Please Enter Your First Name: ");
-            firstName = in.readLine().trim();
-         } while (firstName.isEmpty());
-         
-         do {
-            System.out.print("Please Enter Your Last Name: ");
-            lastName = in.readLine().trim();
-         } while (lastName.isEmpty());
-         
-         do {
-            System.out.print("Please Enter Your Gender (M/F): ");
-            gender = in.readLine().trim().toUpperCase();
-            if (!gender.equals("M") && !gender.equals("F")) {
-               System.out.println("This is an Invalid gender. Please enter M or F.");
-               gender = "";
+            System.out.println("Please enter your role (Customer, Pilot, Technician, Manager): ");
+            role = in.readLine().trim();
+            role = role.substring(0, 1).toUpperCase() + role.substring(1).toLowerCase();
+            if (!(role.equals("Customer") || role.equals("Pilot") || role.equals("Technician") || role.equals("Manager"))) {
+               System.out.println("This is an invalid role. Please correctly enter Customer, Pilot, Technician, or Manager.");
+               role = "";
             }
-         } while (gender.isEmpty());
-         
+         } while (role.isEmpty());
+
+         //now getting the userName and password 
          do {
-            System.out.print("Please Enter DOB (YYYY-MM-DD): ");
-            dob = in.readLine().trim();
-            if (!dob.matches("\\d{4}-\\d{2}-\\d{2}")) {
-               System.out.println("This is an Invalid date format. Use YYYY-MM-DD.");
-               dob = "";
-            }
-         } while (dob.isEmpty());
+            System.out.println("Please enter a username: "); 
+            userName = in.readLine().trim();
+         } while (userName.isEmpty()); 
 
          do {
-            System.out.print("Please Enter Your Address: ");
-            address = in.readLine().trim();
-         } while (address.isEmpty());
+            System.out.println("Please enter your password: "); 
+            password = in.readLine().trim(); 
+         } while (!isValidPassword(password)); 
 
-         do {
-            System.out.print("Please Enter Your Phone Number: ");
-            phoneNumber = in.readLine().trim();
-            if (!phoneNumber.matches("[0-9()+\\-\\.x ]{7,30}")) {
-               System.out.println("This is an Invalid phone number format.");
-               phoneNumber = "";
+         String userID = ""; 
+
+         if (role.equals("Customer")) {
+            //extra information needed for customer 
+            String firstName, lastName, gender, dob, address, phoneNumber, zipcode;
+            
+            do {
+               System.out.print("Please Enter Your First Name: ");
+               firstName = in.readLine().trim();
+            } while (firstName.isEmpty());
+            
+            do {
+               System.out.print("Please Enter Your Last Name: ");
+               lastName = in.readLine().trim();
+            } while (lastName.isEmpty());
+            
+            do {
+               System.out.print("Please Enter Your Gender (M/F): ");
+               gender = in.readLine().trim().toUpperCase();
+               if (!gender.equals("M") && !gender.equals("F")) {
+                  System.out.println("This is an Invalid gender. Please enter M or F.");
+                  gender = "";
+               }
+            } while (gender.isEmpty());
+            
+            do {
+               System.out.print("Please Enter DOB (YYYY-MM-DD): ");
+               dob = in.readLine().trim();
+               if (!dob.matches("\\d{4}-\\d{2}-\\d{2}")) {
+                  System.out.println("This is an Invalid date format. Use YYYY-MM-DD.");
+                  dob = "";
+               }
+            } while (dob.isEmpty());
+
+            do {
+               System.out.print("Please Enter Your Address: ");
+               address = in.readLine().trim();
+            } while (address.isEmpty());
+
+            do {
+               System.out.print("Please Enter Your Phone Number: ");
+               phoneNumber = in.readLine().trim();
+               if (!phoneNumber.matches("[0-9()+\\-\\.x ]{7,30}")) {
+                  System.out.println("This is an Invalid phone number format.");
+                  phoneNumber = "";
+               }
+            } while (phoneNumber.isEmpty());
+
+            do {
+                  System.out.print("Please Enter Your Zipcode: ");
+                  zipcode = in.readLine().trim();
+                  if (!zipcode.matches("\\d{5}")) {
+                     System.out.println("The Zipcode must be exactly 5 digits.");
+                     zipcode = "";
+                  }
+            } while (zipcode.isEmpty());
+
+            String query = "SELECT MAX(CustomerID) FROM Customer;";
+            List<List<String>> resultList = esql.executeQueryAndReturnResult(query);
+            
+            //Creating Unqiue CustomerID
+            int nextCustomerID = 1;
+            if (!resultList.isEmpty() && resultList.get(0).get(0) != null) {
+                  nextCustomerID = Integer.parseInt(resultList.get(0).get(0)) + 1;
+               }
+
+            userID = Integer.toString(nextCustomerID);
+            
+            //New User Intersertion 
+            String insertCustomerQuery = String.format(
+               "INSERT INTO Customer (CustomerID, FirstName, LastName, Gender, DOB, Address, Phone, Zip) " + 
+               "VALUES (%d, '%s', '%s', '%s', '%s', '%s', '%s', '%s');", 
+               nextCustomerID, firstName, lastName, gender, dob, address, phoneNumber, zipcode);
+
+            esql.executeUpdate(insertCustomerQuery);
+
+         } else if (role.equals("Pilot")) {
+            //checking if there is an existing pilotID (validiation)
+            do {
+               System.out.println("Please enter the existing Pilot ID: "); 
+               String pilotID = in.readLine().trim(); 
+
+               if (pilotID.isEmpty()) {
+                  System.out.println("The pilot ID can't be empty");
+                  continue; 
+               }
+
+               String query = String.format("SELECT * FROM Pilot WHERE PilotID = '%s';", pilotID);
+               if (esql.executeQuery(query) > 0) {
+                  userID = pilotID;
+                  break;
+               } else {
+                  System.out.println("This is an invalid Pilot ID.");
+               }
+            } while (true);
+         } else if (role.equals("Technician")) {
+            //check if there is an existing technician id
+            do {
+               System.out.println("Please enter tthe existing technician ID: "); 
+               String technicianID = in.readLine().trim();
+
+               if (technicianID.isEmpty()) {
+                  System.out.println("The technician ID can't be empty.");
+                  continue;
+               }
+
+               String query = String.format("SELECT * FROM Technician WHERE TechnicianID = '%s';", technicianID);
+               if (esql.executeQuery(query) > 0) {
+                  userID = technicianID; 
+                  break; 
+               } else {
+                  System.out.println("This is an invalid technician ID.");
+               }
+            } while (true);
+
+         } else if (role.equals("Manager")) {
+            //manager has just a pretend id 
+            String managerQuery = "SELECT MIN(CAST(userID AS INT)) FROM Login WHERE userID ~ '^[-]?[0-9]+$';";
+            List<List<String>> resultList = esql.executeQueryAndReturnResult(managerQuery);
+
+            int minID = -1;
+            if (!resultList.isEmpty() && resultList.get(0).get(0) != null) {
+               minID = Integer.parseInt(resultList.get(0).get(0));
+               if (minID < 0) {
+                  userID = Integer.toString(minID - 1);
+               } else {
+                  userID = "-1";
+               }
+            } else {
+               userID = "-1";
             }
-        } while (phoneNumber.isEmpty());
-
-        do {
-            System.out.print("Please Enter Your Zipcode: ");
-            zipcode = in.readLine().trim();
-            if (!zipcode.matches("\\d{5}")) {
-               System.out.println("The Zipcode must be exactly 5 digits.");
-               zipcode = "";
-            }
-        } while (zipcode.isEmpty());
-
-        String query = "SELECT MAX(CustomerID) FROM Customer;";
-        List<List<String>> resultList = esql.executeQueryAndReturnResult(query);
-        
-        //Creating Unqiue CustomerID
-        int uniqueCustomerID = 1;
-        if (!resultList.isEmpty() && resultList.get(0).get(0) != null) {
-            uniqueCustomerID = Integer.parseInt(resultList.get(0).get(0)) + 1;
          }
-        
-      //New User Intersertion 
-      String insertQuery = String.format("INSERT INTO Customer (CustomerID, FirstName, LastName, Gender, DOB, Address, Phone, Zip) " + "VALUES (%d, '%s', '%s', '%s', '%s', '%s', '%s', '%s');", uniqueCustomerID, firstName, lastName, gender, dob, address, phoneNumber, zipcode);
+      
+      //putting information into LOGIN table 
+      String insertLoginQuery = String.format( 
+         "INSERT INTO Login (userID, username, password, role) " +
+         "VALUES ('%s', '%s', '%s', '%s');",
+         userID, userName, password, role); 
+      
+      esql.executeUpdate(insertLoginQuery);
 
-      esql.executeUpdate(insertQuery);
-      System.out.println("User was successfully created!");
+
+      //inserting this customer 
+      System.out.println("User was successfully created with role: " + role);
       
       } catch (Exception e) {
-      System.err.println("There Was An Error in CreateUser: " + e.getMessage());
+         System.err.println("There Was An Error in CreateUser: " + e.getMessage());
+      }
    }
-}
-
+   
    /*
     * Check log in credentials for an existing user
     * @return User login or null is the user does not exist
     **/
    public static String LogIn(AirlineManagement esql){
       try {
-         System.out.print("Please Enter Your First Name: ");
-         String firstName = in.readLine();
+         System.out.print("Please Enter Your Username: ");
+         String userName = in.readLine();
 
-         System.out.print("Please Enter Your Last Name: ");
-         String lastName = in.readLine();
+         System.out.print("Please Enter Your Password: ");
+         String password = in.readLine();
 
-         String query = String.format("SELECT CustomerID FROM Customer WHERE FirstName = '%s' AND LastName = '%s';", firstName, lastName);
+         String query = String.format(
+            "SELECT role FROM Login WHERE userName = '%s' AND password = '%s';", 
+            userName, password);
 
          List<List<String>> resultList = esql.executeQueryAndReturnResult(query);
+
          if (resultList.size() > 0) {
-            System.out.println("The Login Was Successful!");
-            return firstName;
+            String role = resultList.get(0).get(0);
+            System.out.println("The Login Was Successful! Successfully logged in as: " + role);
+            return role;
          } else {
-            System.out.println("The Login Was Not Successful.");
+            System.out.println("The Login Was Not Successful. Wrong username or password");
             return null;
          }
       } catch (Exception e) {
@@ -469,7 +603,7 @@ public class AirlineManagement {
       }
    }//end
 
-// Rest of the functions definition go in here
+   // Rest of the functions definition go in here
 
    //given the flight number, get the flight's schedule for for the week
    //using Schedule Table
