@@ -284,7 +284,7 @@ public class AirlineManagement {
                 //**the following functionalities should only be able to be used by customers**
                 System.out.println("11. Search Flights");
                 System.out.println("12. View Ticket Costs");
-                System.out.println(".........................");
+                System.out.println("13. View Airplane Type for Flight");
 
                 //**the following functionalities should ony be able to be used by Pilots**
                 System.out.println("15. Maintenace Request");
@@ -309,6 +309,7 @@ public class AirlineManagement {
                    case 10: feature10(esql); break;
                    case 11: feature11(esql); break;
                    case 12: feature12(esql); break;
+                   case 13: feature13(esql); break;
 
 
 
@@ -798,7 +799,7 @@ public class AirlineManagement {
          int rowCount = esql.executeQueryAndPrintResult(query);
 
          if (rowCount == 0) {
-            System.out.println("There is no flight instantances found for this Flight Number and date range");
+            System.out.println("There is no ticket costs found for this Flight Number");
          }
 
       } catch (Exception e) {
@@ -806,7 +807,30 @@ public class AirlineManagement {
       }
    }
 
+   //given a flight number, find the airplane type (make, model)
+   //Use Flight and Plane Table
+   public static void feature13(AirlineManagement esql) {
+      try {
+         System.out.print("Please Enter Flight Number: ");
+         String flightNum = in.readLine();
 
+         String query = String.format(
+            "SELECT P.Make, P.Model " +
+            "FROM Flight F " +
+            "JOIN Plane P ON F.PlaneID = P.PlaneID " +
+            "WHERE F.FlightNumber = '%s';", 
+            flightNum);
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There are no planes found for this Flight Number.");
+            }
+
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
 
 
 
@@ -851,7 +875,7 @@ public class AirlineManagement {
       }
    }
 
-
+   
 
 
 
