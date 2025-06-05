@@ -279,7 +279,7 @@ public class AirlineManagement {
                 System.out.println(".........................");
 
                 //**the following functionalities should only be able to be used by customers**
-                System.out.println("10. Search Flights");
+                System.out.println("11. Search Flights");
                 System.out.println(".........................");
                 System.out.println(".........................");
 
@@ -295,6 +295,16 @@ public class AirlineManagement {
                 System.out.println("20. Log out");
                 switch (readChoice()){
                    case 1: feature1(esql); break;
+                   case 2: feature2(esql); break;
+                   case 3: feature3(esql); break;
+                   case 4: feature4(esql); break;
+                   case 5: feature5(esql); break;
+
+                   case 11: feature11(esql); break;
+
+
+
+                   case 15: feature15(esql); break; 
                    
 
 
@@ -453,9 +463,250 @@ public class AirlineManagement {
 
 // Rest of the functions definition go in here
 
-   public static void feature1(AirlineManagement esql) {}
-  
+   //given the flight number, get the flight's schedule for for the week
+   //using Schedule Table
+   public static void feature1(AirlineManagement esql) {
+      try {
+         System.out.print("Please Enter Your Flight Number: ");
+         String flightNum = in.readLine();
+
+         String query = String.format("SELECT DayOfWeek, DepartureTime, ArrivalTime " + 
+         "FROM Schedule " + 
+         "WHERE FlightNumber = '%s' " +
+         "ORDER BY CASE " + 
+         "WHEN DayOfWeek = 'Monday' THEN 1 " + 
+         "WHEN DayOfWeek = 'Tuesday' THEN 2 " + 
+         "WHEN DayOfWeek = 'Wednesday' THEN 3 " +
+         "WHEN DayOfWeek = 'Thursday' THEN 4 " +
+         "WHEN DayOfWeek = 'Friday' THEN 5 " +
+         "WHEN DayOfWeek = 'Saturday' THEN 6 " +
+         "WHEN DayOfWeek = 'Sunday' THEN 7 " +
+         "END;", flightNum);
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There is no schedule for this flight number.");
+         }
+      } catch (Exception e){
+         System.err.println(e.getMessage());
+      }
+   }
+
+   //given the flight and date, get the number of seats still available and the number of seats sold
+   //using FlightInstance Table
+   public static void feature2(AirlineManagement esql) {
+      try {
+         System.out.print("Please Enter Flight Number: ");
+         String flightNum = in.readLine();
+
+         System.out.print("Please Enter the Date of your Flight (MM/DD/YY): ");
+         String flightDate = in.readLine();
+
+         String query = String.format(
+            "SELECT SeatsTotal - SeatsSold AS SeatsAvailable, SeatsSold " +
+            "FROM FlightInstance " +
+            "WHERE FlightNumber = '%s' AND FlightDate = '%s';",
+            flightNum, flightDate);
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There is no flight instance found for this flight number and date.");
+         }
+         
+      } catch (Exception e){
+         System.err.println(e.getMessage());
+      }
+   }
+
+   //given the flight and date, find whether the flight departed on time and arrived on time
+   //using FlightInstance Table
+   public static void feature3(AirlineManagement esql) {
+      try {
+         System.out.print("Please Enter Flight Number: ");
+         String flightNum = in.readLine();
+
+         System.out.print("Please Enter the Date of your Flight (MM/DD/YY): ");
+         String flightDate = in.readLine();
+
+         String query = String.format(
+            "SELECT DepartedOnTime, ArrivedOnTime " +
+            "FROM FlightInstance " +
+            "WHERE FlightNumber = '%s' AND FlightDate = '%s';",
+            flightNum, flightDate);
+            
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There is no flight instance found for this flight number and date.");
+         }
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
+
+   //given a date, get all flight scheduled on that day
+   //using FlightInstance Table
+   public static void feature4(AirlineManagement esql) {
+      try {
+         System.out.print("Please Enter Flight Date (MM/DD/YY): ");
+         String flightDate = in.readLine();
+
+         String query = String.format(
+            "SELECT FlightNumber, NumOfStops, TicketCost " +
+            "FROM FlightInstance " +
+            "WHERE FlightDate = '%s';",
+            flightDate);
+         
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There is no flights scheduled for this flight date.");
+         }
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
+
+   //given a fight and date, get a list of passengers who made reservations, are on the waiting list, actually flew, on the flight (for flights already completed)
+   //using Reservation Table and Customer Table
+   public static void feature5(AirlineManagement esql) {
+      try {
+         System.out.println("Please Enter Reservation ID: ");
+         String reserveID = in.readLine();
+
+         String query = String.format(
+            "SELECT C.FirstName, C.LastName, C.Gender, C.DOB, C.Address, C.Phone, C.Zip " +
+            "FROM Reservation R, Customer C " +
+            "WHERE R.ReservationID = '%s' AND R.CustomerID = C.CustomerID;",
+            reserveID);
+
+            int rowCount = esql.executeQueryAndPrintResult(query);
+
+            if (rowCount == 0) {
+            System.out.println("There are no reservations found for this ReservationID.");
+            }
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
 
 
-}//end AirlineManagement
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   //new york, miami, 5/5/25
+   //given a destination and a departure city, find all fights on a given date 
+   //(must return departure and arrival time, number of stops scheduled and ontimerecord as a percentage)
+   //using Flight table and FlightInstance table and Schedule Table
+   public static void feature11(AirlineManagement esql) {
+      try {
+      System.out.print("Please Enter Departure City: ");
+      String departureCity = in.readLine();
+
+      System.out.print("Please Enter Arrival City: ");
+      String arrivalCity = in.readLine();
+
+      System.out.print("Please  Flight Date (MM/DD/YY): ");
+      String flightDate = in.readLine();
+
+      String query = String.format(
+            "SELECT S.DepartureTime, S.ArrivalTime, FI.NumOfStops, " +
+            "ROUND(100.0 * " +
+            "(SELECT COUNT(*) FROM FlightInstance FI2 " +
+            " WHERE FI2.FlightNumber = F.FlightNumber " +
+            " AND FI2.DepartedOnTime = TRUE AND FI2.ArrivedOnTime = TRUE) / " +
+            "(SELECT COUNT(*) FROM FlightInstance FI3 " +
+            " WHERE FI3.FlightNumber = F.FlightNumber), 2) AS OnTimePercentage " +
+            "FROM Flight F " +
+            "JOIN FlightInstance FI ON F.FlightNumber = FI.FlightNumber " +
+            "JOIN Schedule S ON F.FlightNumber = S.FlightNumber " +
+            "WHERE F.DepartureCity = '%s' AND F.ArrivalCity = '%s' " +
+            "AND FI.FlightDate = '%s';",
+            departureCity, arrivalCity, flightDate);
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+            if (rowCount == 0) {
+            System.out.println("There are no flights found for this city and date.");
+            }
+            
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   //give a plane id and a date range, list all the dates and the codes for repairs performed
+   //using Repair Table
+   public static void feature15(AirlineManagement esql) {
+      try {
+         System.out.print("Please Enter Plane ID: ");
+         String planeID = in.readLine();
+
+         System.out.print("Please Enter Start Date (YYYY-MM-DD): ");
+         String startDate = in.readLine();
+
+         System.out.print("Please Enter End Date (YYYY-MM-DD): ");
+         String endDate = in.readLine();
+
+         String query = String.format(
+            "SELECT RepairDate, RepairCode " +
+            "FROM Repair " +
+            "WHERE PlaneID = '%s' " +
+            "AND RepairDate BETWEEN '%s' AND '%s' " +
+            "ORDER BY RepairDate ASC;",
+            planeID, startDate, endDate);
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There are no repairs found for this planeID and and date range.");
+            }
+
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+} //end AirlineManagement
 
