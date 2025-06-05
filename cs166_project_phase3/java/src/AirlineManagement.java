@@ -279,6 +279,7 @@ public class AirlineManagement {
                 System.out.println("7. View Plane Information");
                 System.out.println("8. View Technician Repairs");
                 System.out.println("9. View Plane Repair History");
+                System.out.println("10. View Flight Statistics");
 
                 //**the following functionalities should only be able to be used by customers**
                 System.out.println("11. Search Flights");
@@ -305,6 +306,7 @@ public class AirlineManagement {
                    case 7: feature7(esql); break;
                    case 8: feature8(esql); break;
                    case 9: feature9(esql); break;
+                   case 10: feature10(esql); break;
 
 
                    case 11: feature11(esql); break;
@@ -703,6 +705,42 @@ public class AirlineManagement {
       }
    }
 
+
+   //given a flight and range of date (start date and end date), show the statistics of the flight 
+   //number of days the flight departed and arrived, number of sold and unsold tickets
+   //Use FlightInstance Table
+   public static void feature10(AirlineManagement esql) {
+      try {
+         System.out.println("Please enter flight number: "); 
+         String flightNum = in.readLine();
+
+         System.out.println("Please enter start date (MM/DD/YY): ");
+         String startDate = in.readLine(); 
+
+         System.out.println("Please enter end date (MM/DD/YY): ");
+         String endDate = in.readLine(); 
+
+         String query = String.format(
+            "SELECT " +
+            "COUNT(CASE WHEN DepartedOnTime = TRUE THEN 1 END) AS DepartedOnTimeCount, " +
+            "COUNT(CASE WHEN ArrivedOnTime = TRUE THEN 1 END) AS ArrivedOnTimeCount, " +
+            "SUM(SeatsSold) AS TotalSeatsSold, " +
+            "SUM(SeatsTotal - SeatsSold) AS TotalSeatsUnsold " +
+            "FROM FlightInstance " +
+            "WHERE FlightNumber = '%s' " +
+            "AND FlightDate BETWEEN '%s' AND '%s';",
+            flightNum, startDate, endDate);
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There is no flight instantances found for this Flight Number and date range");
+         }
+
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
 
 
 
