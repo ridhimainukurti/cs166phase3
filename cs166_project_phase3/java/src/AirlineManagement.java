@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.util.List;
 import java.util.ArrayList;
 import java.lang.Math;
+import java.util.UUID;
 
 /**
  * This class defines a simple embedded SQL utility class that is designed to
@@ -285,6 +286,7 @@ public class AirlineManagement {
                 System.out.println("11. Search Flights");
                 System.out.println("12. View Ticket Costs");
                 System.out.println("13. View Airplane Type for Flight");
+                System.out.println("14. Reserve a Flight (Waitlist if Needed)");
 
                 //**the following functionalities should ony be able to be used by Pilots**
                 System.out.println("15. Maintenace Request");
@@ -310,9 +312,7 @@ public class AirlineManagement {
                    case 11: feature11(esql); break;
                    case 12: feature12(esql); break;
                    case 13: feature13(esql); break;
-
-
-
+                   case 14: feature14(esql); break;
                    case 15: feature15(esql); break; 
                    
 
@@ -832,6 +832,67 @@ public class AirlineManagement {
       }
    }
 
+   //given a make reservation for a flight, get on the waitlist for a flight if the flight is full
+   //Use Reservation and FlightInstance Table
+   public static void feature14(AirlineManagement esql) {
+      try {
+         System.out.print("Please enter Customer ID: ");
+         String customID = in.readLine();
+
+         System.out.println("Please enter Flight Instance ID: ");
+         String flightInstantceID = in.readLine(); 
+
+         //checking for the number of seats
+         String checkingSeatsQuery = String.format(
+            "SELECT SeatsSold, SeatsTotal " +
+            "FROM FlightInstance " +
+            "WHERE FlightInstanceID = %s;",
+            flightInstantceID);
+         
+         List<List<String>> resultList = esql.executeQueryAndReturnResult(checkingSeatsQuery);
+
+         if (resultList.isEmpty()) {
+            System.out.println("Thi is the wrong flight instance ID.");
+            return;
+         }
+
+         int seatsSold = Integer.parseInt(resultList.get(0).get(0));
+         int seatsTotal = Integer.parseInt(resultList.get(0).get(1));
+
+         String currStatus;
+         if (seatsSold < seatsTotal) {
+            currStatus = "reserved"; 
+         } else {
+            currStatus = "waitlisted";
+         }
+         
+         //creating unique reserationIDs
+         String reserveID = "R" + UUID.randomUUID().toString().substring(0, 8);
+
+         //inserting the reservation 
+         String insertReservation = String.format(
+            "INSERT INTO Reservation (ReservationID, CustomerID, FlightInstanceID, Status) " +
+            "VALUES ('%s', %s, %s, '%s');",
+            reserveID, customID, flightInstantceID, currStatus); 
+         
+         esql.executeUpdate(insertReservation);
+
+         //if status is reserved then we will need to increment the seats sold 
+         if (currStatus.equals("reserved")) {
+            String updateSeatsQuery = String.format(
+               "UPDATE FlightInstance " +
+               "SET SeatsSold = SeatsSold + 1 " +
+               "WHERE FlightInstanceID = %s;", flightInstantceID); 
+            
+            esql.executeUpdate(updateSeatsQuery);
+         }
+
+         System.out.println("Reservation " + (currStatus.equals("reserved") ? "confirmed" : "waitlisted") + ". Your Reservation ID is: " + reserveID);
+         
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
 
 
 
