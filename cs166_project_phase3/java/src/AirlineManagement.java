@@ -301,6 +301,10 @@ public class AirlineManagement {
                    case 5: feature5(esql); break;
 
                    case 11: feature11(esql); break;
+
+
+
+                   case 15: feature15(esql); break; 
                    
 
 
@@ -658,6 +662,38 @@ public class AirlineManagement {
 
 
 
+
+   //give a plane id and a date range, list all the dates and the codes for repairs performed
+   //using Repair Table
+   public static void feature15(AirlineManagement esql) {
+      try {
+         System.out.print("Please Enter Plane ID: ");
+         String planeID = in.readLine();
+
+         System.out.print("Please Enter Start Date (YYYY-MM-DD): ");
+         String startDate = in.readLine();
+
+         System.out.print("Please Enter End Date (YYYY-MM-DD): ");
+         String endDate = in.readLine();
+
+         String query = String.format(
+            "SELECT RepairDate, RepairCode " +
+            "FROM Repair " +
+            "WHERE PlaneID = '%s' " +
+            "AND RepairDate BETWEEN '%s' AND '%s' " +
+            "ORDER BY RepairDate ASC;",
+            planeID, startDate, endDate);
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There are no repairs found for this planeID and and date range.");
+            }
+
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
 
 
 
