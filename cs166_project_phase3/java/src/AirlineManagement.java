@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.lang.Math;
 import java.util.UUID;
-import javax.swing.*;
 
 /**
  * This class defines a simple embedded SQL utility class that is designed to
@@ -295,7 +294,7 @@ public class AirlineManagement {
                 //**the following functionalities should ony be able to be used by Pilots**
                 System.out.println("15. View Pilot Maintenance Requests");
 
-                } else if (authorisedUser.equals("Technicians")) {
+                } else if (authorisedUser.equals("Technician")) {
                 //**the following functionalities should ony be able to be used by Technicians**
                 System.out.println("16. View Plane Repair History");
                 System.out.println("17. View Maintenace Requests");
