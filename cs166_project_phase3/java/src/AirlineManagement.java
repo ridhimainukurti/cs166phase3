@@ -283,7 +283,7 @@ public class AirlineManagement {
 
                 //**the following functionalities should only be able to be used by customers**
                 System.out.println("11. Search Flights");
-                System.out.println(".........................");
+                System.out.println("12. View Ticket Costs");
                 System.out.println(".........................");
 
                 //**the following functionalities should ony be able to be used by Pilots**
@@ -307,9 +307,8 @@ public class AirlineManagement {
                    case 8: feature8(esql); break;
                    case 9: feature9(esql); break;
                    case 10: feature10(esql); break;
-
-
                    case 11: feature11(esql); break;
+                   case 12: feature12(esql); break;
 
 
 
@@ -742,15 +741,6 @@ public class AirlineManagement {
       }
    }
 
-
-
-
-
-
-
-
-
-
    //new york, miami, 5/5/25
    //given a destination and a departure city, find all fights on a given date 
    //(must return departure and arrival time, number of stops scheduled and ontimerecord as a percentage)
@@ -792,6 +782,29 @@ public class AirlineManagement {
       }
    }
 
+   //given a flight number find the ticket cost 
+   //Use FlightInstance Table 
+   public static void feature12(AirlineManagement esql) {
+      try {
+         System.out.println("Please enter flight number: "); 
+         String flightNum = in.readLine(); 
+
+         String query = String.format(
+            "SELECT DISTINCT TicketCost " +
+            "FROM FlightInstance " +
+            "WHERE FlightNumber = '%s';",
+            flightNum);
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There is no flight instantances found for this Flight Number and date range");
+         }
+
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
 
 
 
