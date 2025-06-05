@@ -289,6 +289,8 @@ public class AirlineManagement {
                 System.out.println("12. View Ticket Costs");
                 System.out.println("13. View Airplane Type for Flight");
                 System.out.println("14. Reserve a Flight (Waitlist if Needed)");
+                System.out.println("19. Extra Feature: Reservation History");
+                System.out.println("21. Extra Feature: Popular Flights");
 
                 } else if (authorisedUser.equals("Pilot")) {
                 //**the following functionalities should ony be able to be used by Pilots**
@@ -299,6 +301,7 @@ public class AirlineManagement {
                 System.out.println("16. View Plane Repair History");
                 System.out.println("17. View Maintenace Requests");
                 System.out.println("18. View Repair Information");
+                System.out.println("22. Extra Feature: View Maintenance Staff");
 
                 }
 
@@ -320,12 +323,15 @@ public class AirlineManagement {
                    case 12: if (authorisedUser.equals("Customer")) feature12(esql); break;
                    case 13: if (authorisedUser.equals("Customer")) feature13(esql); break;
                    case 14: if (authorisedUser.equals("Customer")) feature14(esql); break;
+                   case 19: if (authorisedUser.equals("Customer")) feature19(esql); break;
+                   case 21: if (authorisedUser.equals("Customer")) feature21(esql); break;
 
                    case 15: if (authorisedUser.equals("Pilot")) feature15(esql); break; 
 
                    case 16: if (authorisedUser.equals("Technician")) feature16(esql); break; 
                    case 17: if (authorisedUser.equals("Technician")) feature17(esql); break;
                    case 18: if (authorisedUser.equals("Technician")) feature18(esql); break;
+                   case 22: if (authorisedUser.equals("Technician")) feature22(esql); break;
 
                    case 20: usermenu = false; break;
                    default : System.out.println("Unrecognized choice!"); break;
@@ -1153,4 +1159,76 @@ public class AirlineManagement {
          System.err.println(e.getMessage());
       } 
    }
+
+   //given the CustomerID, show all reservations (both the past and the present) for that customer
+   //using the Reservations Table and FlightInstance Table
+   public static void feature19(AirlineManagement esql) {
+      try {
+         System.out.print("Please enter your CustomerID: ");
+         String customerID = in.readLine();
+         
+         String query = String.format(
+            "SELECT R.ReservationID, FI.FlightNumber, FI.FlightDate, F.DepartureCity, F.ArrivalCity, R.Status " +
+            "FROM Reservation R " +
+            "JOIN FlightInstance FI ON R.FlightInstanceID = FI.FlightInstanceID " +
+            "JOIN Flight F ON FI.FlightNumber = F.FlightNumber " +
+            "WHERE R.CustomerID = '%s' " +
+            "ORDER BY FI.FlightDate ASC;",
+            customerID);
+            
+         int rowCount = esql.executeQueryAndPrintResult(query);
+         
+         if (rowCount == 0) {
+            System.out.println("No reservations found for this Customer ID.");
+         }
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
+
+   //listing the top 5 popular flights (using number of reservations)
+   //using Flight Table, FlightInstance Table, and Reservation Table
+   public static void feature21(AirlineManagement esql) {
+      try {
+         String query =
+            "SELECT F.FlightNumber, COUNT(*) AS NumReservations " +
+            "FROM Reservation R " +
+            "JOIN FlightInstance FI ON R.FlightInstanceID = FI.FlightInstanceID " +
+            "JOIN Flight F ON FI.FlightNumber = F.FlightNumber " +
+            "GROUP BY F.FlightNumber " +
+            "ORDER BY NumReservations DESC " +
+            "LIMIT 5;";
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There are no reservations found to determine popular flights.");
+         } else {
+            System.out.println("Of Course! Here are the top 5 most popular flights based on reservations!");
+         }
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
+
+   //this feature lists the maintenance staff's work (number of repairs per Technician)
+   //Using Repairs Table
+   public static void feature22(AirlineManagement esql) {
+      try {
+         String query =
+            "SELECT TechnicianID, COUNT(*) AS RepairCount " +
+            "FROM Repair " +
+            "GROUP BY TechnicianID " +
+            "ORDER BY RepairCount DESC;";
+         int rowCount = esql.executeQueryAndPrintResult(query);
+         if (rowCount == 0) {
+            System.out.println("No repair records found.");
+         } else {
+            System.out.println("Technicians ranked by number of repairs completed.");
+         }
+      } catch (Exception e) {
+        System.err.println(e.getMessage());
+      }
+   }
+
 } //end AirlineManagement
