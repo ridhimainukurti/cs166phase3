@@ -278,6 +278,7 @@ public class AirlineManagement {
                 System.out.println("6. View Traveler Information");
                 System.out.println("7. View Plane Information");
                 System.out.println("8. View Technician Repairs");
+                System.out.println("9. View Plane Repair History");
 
                 //**the following functionalities should only be able to be used by customers**
                 System.out.println("11. Search Flights");
@@ -303,6 +304,7 @@ public class AirlineManagement {
                    case 6: feature6(esql); break;
                    case 7: feature7(esql); break;
                    case 8: feature8(esql); break;
+                   case 9: feature9(esql); break;
 
 
                    case 11: feature11(esql); break;
@@ -669,9 +671,37 @@ public class AirlineManagement {
       }
    }
 
+   //given a plane id and date range, list all the dates and codes for repairs performed 
+   //Use Repair Table
+   public static void feature9(AirlineManagement esql) {
+      try {
+         System.out.println("Please enter Plane ID: "); 
+         String planeID = in.readLine();
 
+         System.out.println("Please enter start date (YYYY-MM-DD): ");
+         String startDate = in.readLine(); 
 
+         System.out.println("Please enter end date (YYYY-MM-DD): ");
+         String endDate = in.readLine(); 
 
+         String query = String.format(
+            "SELECT RepairDate, RepairCode " +
+            "FROM Repair " +
+            "WHERE PlaneID = '%s' " +
+            "AND RepairDate BETWEEN '%s' AND '%s' " +
+            "ORDER BY RepairDate ASC;",
+            planeID, startDate, endDate);
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There is no repairs found for this Plane ID and date range");
+         }
+
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
 
 
 
