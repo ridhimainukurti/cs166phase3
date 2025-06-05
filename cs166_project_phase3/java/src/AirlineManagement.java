@@ -276,7 +276,7 @@ public class AirlineManagement {
                 System.out.println("4. View Flights of the day");  
                 System.out.println("5. View Full Order ID History");
                 System.out.println("6. View Traveler Information");
-                System.out.println(".........................");
+                System.out.println("7. View Plane Information");
 
                 //**the following functionalities should only be able to be used by customers**
                 System.out.println("11. Search Flights");
@@ -300,6 +300,8 @@ public class AirlineManagement {
                    case 4: feature4(esql); break;
                    case 5: feature5(esql); break;
                    case 6: feature6(esql); break;
+                   case 7: feature7(esql); break;
+
 
                    case 11: feature11(esql); break;
 
@@ -616,6 +618,30 @@ public class AirlineManagement {
          System.err.println(e.getMessage()); 
       }
    }
+
+   //given a plane number, get its make, model, age, last repair date 
+   //Use Plane Table
+   public static void feature7(AirlineManagement esql) {
+      try {
+         System.out.println("Please enter Plane ID: ");
+         String planeID = in.readLine(); 
+
+         String query = String.format(
+            "SELECT Make, Model, (EXTRACT(YEAR FROM CURRENT_DATE) - Year) AS Age, LastRepairDate " +
+            "FROM Plane " +
+            "WHERE PlaneID = '%s';",
+            planeID);
+         
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There is no information found for this Reservation ID");
+         }
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
+
 
 
 
