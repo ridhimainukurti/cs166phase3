@@ -289,8 +289,8 @@ public class AirlineManagement {
                 System.out.println("14. Reserve a Flight (Waitlist if Needed)");
 
                 //**the following functionalities should ony be able to be used by Pilots**
-                System.out.println("15. Maintenace Request");
-                System.out.println(".........................");
+                System.out.println("15. View Repair Information");
+                System.out.println("16. View Maintenace Requests");
                 System.out.println(".........................");
 
                //**the following functionalities should ony be able to be used by Technicians**
@@ -314,7 +314,7 @@ public class AirlineManagement {
                    case 13: feature13(esql); break;
                    case 14: feature14(esql); break;
                    case 15: feature15(esql); break; 
-                   
+                   case 16: feature16(esql); break;
 
 
 
@@ -894,16 +894,6 @@ public class AirlineManagement {
       }
    }
 
-
-
-
-
-
-
-
-
-
-
    //give a plane id and a date range, list all the dates and the codes for repairs performed
    //using Repair Table
    public static void feature15(AirlineManagement esql) {
@@ -929,6 +919,31 @@ public class AirlineManagement {
 
          if (rowCount == 0) {
             System.out.println("There are no repairs found for this planeID and and date range.");
+            }
+
+      } catch (Exception e) {
+         System.err.println(e.getMessage());
+      }
+   }
+
+   //given a pilot ID, list all maintenance request made by that pilot 
+   //Use MaintenanceReqeust Table 
+   public static void feature16(AirlineManagement esql) {
+      try {
+         System.out.print("Please Enter Pilot ID: ");
+         String pilotID = in.readLine();
+
+         String query = String.format(
+           "SELECT PlaneID, RepairCode, RequestDate " +
+            "FROM MaintenanceRequest " +
+            "WHERE PilotID = '%s' " +
+            "ORDER BY RequestDate ASC;",
+            pilotID);
+
+         int rowCount = esql.executeQueryAndPrintResult(query);
+
+         if (rowCount == 0) {
+            System.out.println("There are no maintenance requests found for this Plane ID.");
             }
 
       } catch (Exception e) {
